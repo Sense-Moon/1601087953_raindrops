@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style>
+	body {
+	    display: flex;
+	    justify-content: center;
+	    align-items: center;
+	    height: 100vh;
+	    margin: 0;
+	    background-color: #000000;
+	    overflow: hidden;
+	    text-align:center;
+	}
+	.wrapper {
+	    display: flex;
+	    flex-direction: column;
+	    justify-content: center;
+	    align-items: center;
+	    width: 100%;
+	    height: 90%;
+	    position: relative;
+	    text-align:center;
+	}
+	.canvas_wrapper {
+	    width: 100%;
+	    height: 90%;
+	    background: url("./background/01.png");
+	    background-size: cover;
+	    position: relative;
+	}
+	.control {
+	    margin: 10px 10px;
+	    height: 10%;
+	    text-align:center;
+	}
+	label{
+		color:white;
+	}
+	.button {
+	  color: white;
+	  background-color: #222;
+	  font-weight: 500;
+	  border-radius: 0.5rem;
+	  font-size: 1rem;
+	  line-height: 2rem;
+	  padding-left: 2rem;
+	  padding-right: 2rem;
+	  padding-top: 0.7rem;
+	  padding-bottom: 0.7rem;
+	  text-align: center;
+	  margin-right: 0.5rem;
+	  display: inline-flex;
+	  align-items: center;
+	  border: none;
+	}
+
+	.button:hover {
+	  background-color: #333;
+	}
+
+	.button svg {
+	  display: inline;
+	  width: 1.3rem;
+	  height: 1.3rem;
+	  margin-right: 0.75rem;
+	  color: white;
+	}
+	</style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="raindrops.js"></script>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="canvas_wrapper">        	
+        </div>
+            <div class="control">
+                <label for="frequency"> </label>
+                <input type="range" id="frequency" min="1" max="10" value="3">
+                <button class="button" type="button" id="bg_btn">
+				  <svg viewBox="0 0 16 16" class="bi bi-arrow-repeat" fill="currentColor" height="16" width="16" xmlns="http://www.w3.org/2000/svg">
+				  <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"></path>
+				  <path d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5.002 5.002 0 0 0 8 3zM3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.1z" fill-rule="evenodd"></path>
+				  </svg>
+				  RANDOM 
+				</button>
+            </div>
+        </div>
+    </div>
+	<script>
+	$(function() {
+	    var hue = 0;
+	    var isUserInteracted = false;  // ユーザーがページと対話したかどうかを示すフラグ
+
+	    // 雨滴エフェクトを設定する関数
+	    function createRaindrops(color, frequency) {
+	        // 新しいパラメータでエフェクトを再設定
+	        $(".canvas_wrapper").raindrops({
+	            color: "#00000040",
+	            rippleSpeed: 0.05,
+	            density: 0.04,
+	            frequency: frequency,
+	            canvasHeight: 50, 
+	        });
+	    }
+
+	    // ユーザーがページと対話したときに雨滴エフェクトを設定
+	    $(document).click(function() {
+	        if (!isUserInteracted) {
+	            var color = $('#color').val();
+	            var frequency = $('#frequency').val();
+	            createRaindrops(color, frequency);
+	            isUserInteracted = true;
+	        }
+	    });
+
+	    // ユーザーがコントロールを変更したときに雨滴エフェクトを更新
+	    $('#color, #frequency').change(function() {
+	        var color = $('#color').val();
+	        var frequency = $('#frequency').val();
+	        createRaindrops(color, frequency);
+	    });
+
+	    // 背景色を設定する関数
+	    function setBackgroundColor(color) {
+	        $('.canvas_wrapper').css('background-color', color);
+	    }
+
+	    // ユーザーが背景色を変更したときに背景色を更新
+	    $('#bgcolor').change(function() {
+	        var color = $('#bgcolor').val();
+	        setBackgroundColor(color);
+	    });
+	});
+
+	// ダブルタップ禁止
+	window.addEventListener('touchstart', function (event) {
+	    if (event.touches.length > 1) {
+	        event.preventDefault();
+	    }
+	}, { passive: false });
+
+	let lastTouchEnd = 0;
+	window.addEventListener('touchend', function (event) {
+	    const now = Date.now();
+	    if (now - lastTouchEnd <= 300) {
+	        event.preventDefault();
+	    }
+	    lastTouchEnd = now;
+	}, false);
+
+	// 画像変更
+	document.getElementById('bg_btn').addEventListener('click', function() {
+	    var totalImages = 2311; //画像枚数
+	    var randomNumber = Math.floor(Math.random() * totalImages) + 1;
+	    document.querySelector('.canvas_wrapper').style.backgroundImage = 'url("./background/' + randomNumber + '.png")';
+	});
+
+	var totalImages = 2311;
+	var randomNumber = Math.floor(Math.random() * totalImages) + 1;
+	document.querySelector('.canvas_wrapper').style.backgroundImage = 'url("./background/' + randomNumber + '.png")';
+
+	</script>
+    
+</body>
+</html>
